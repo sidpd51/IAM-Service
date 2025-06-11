@@ -1,9 +1,17 @@
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { prisma } from "../prisma/client";
-import { ConflictError } from "../utils/errors/app.error";
+import { ConflictError, InternalServerError } from "../utils/errors/app.error";
 import bcrypt from 'bcrypt';
 import { serverConfig } from "../config";
+
+const userPublicFields = {
+    id: true,
+    email: true,
+    name: true,
+    createdAt: true,
+    updatedAt: true,
+};
 
 export const createUser = async (userData: Prisma.UserUncheckedCreateInput) => {
     try {
@@ -28,5 +36,29 @@ export const createUser = async (userData: Prisma.UserUncheckedCreateInput) => {
                 throw new ConflictError(`Password field is missing`);
             };
         }
+    }
+}
+
+export const getUserByEmail = async (email: string) => {
+    try {
+        const user = prisma.user.findUnique({
+            where: {
+                email
+            }
+        });
+        return user;
+    } catch (error) {
+        throw new InternalServerError("Something went wrong in getUserByEmail");
+    }
+}
+
+export const getAllUsers = async () => {
+    try {
+        const users = prisma.user.findMany({
+            select: userPublicFields
+        });
+        return users;
+    } catch (error) {
+        throw new InternalServerError("Something went wrong in getAllUsers");
     }
 }
