@@ -2,13 +2,18 @@ import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { prisma } from "../prisma/client";
 import { ConflictError } from "../utils/errors/app.error";
+import bcrypt from 'bcrypt';
+import { serverConfig } from "../config";
 
-export const createUser = async (user: Prisma.UserUncheckedCreateInput) => {
+export const createUser = async (userData: Prisma.UserUncheckedCreateInput) => {
     try {
-        const newUser = await prisma.user.create({
-            data: user
+        userData.password = await bcrypt.hash(userData.password, serverConfig.SALT_ROUNDS);
+
+        const { password, ...restAttributes } = await prisma.user.create({
+            data: userData
         });
-        return newUser;
+
+        return restAttributes;
     } catch (error) {
         if (error instanceof PrismaClientKnownRequestError) {
             if (error.code === "P2002") {

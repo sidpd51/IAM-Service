@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { createUserService } from "../services/user.service";
 import { ConflictError } from "../utils/errors/app.error";
 
-export const createUserHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const signInHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await createUserService(req.body);
         res.status(201).json({
