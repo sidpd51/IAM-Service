@@ -40,6 +40,9 @@ npm install
 cp .env.example .env
 
 # Update .env with your database and app configuration
+
+# Generate prisma client
+npm run generate
 ```
 
 ---
