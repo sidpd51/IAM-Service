@@ -26,6 +26,8 @@ export const getAllUsersHandler = async (req: Request, res: Response, next: Next
     try {
         const users = await getAllUsersService();
         res.status(StatusCodes.OK).json({
+            success: true,
+            message: "Got all users successfully",
             data: users
         });
     } catch (error) {
