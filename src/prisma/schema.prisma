@@ -21,29 +21,5 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  roles UserRole[]
-
   @@map("users")
-}
-
-model Role {
-  id          String  @id @default(uuid())
-  name        String  @unique
-  description String?
-
-  users UserRole[]
-
-  @@map("roles")
-}
-
-model UserRole {
-  role       Role     @relation(fields: [roleId], references: [id])
-  roleId     String
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
-  isAdmin    Boolean
-  assignedAt DateTime @default(now())
-
-  @@id([roleId, userId])
-  @@map("user_roles")
 }
