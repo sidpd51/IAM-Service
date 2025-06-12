@@ -1,12 +1,14 @@
 import { NextFunction, Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
 import { createUserService, getAllUsersService, signInService } from "../services/user.service";
 import { ConflictError, InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
-import { StatusCodes } from "http-status-codes";
 
 export const signUpHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await createUserService(req.body);
-        res.status(201).json({
+        res.status(StatusCodes.CREATED).json({
+            success: true,
+            message: "User created successfully",
             data: user
         });
     } catch (error) {
@@ -23,7 +25,9 @@ export const signUpHandler = async (req: Request, res: Response, next: NextFunct
 export const getAllUsersHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const users = await getAllUsersService();
-        res.status(201).json({
+        res.status(StatusCodes.OK).json({
+            success: true,
+            message: "Got all users successfully",
             data: users
         });
     } catch (error) {
