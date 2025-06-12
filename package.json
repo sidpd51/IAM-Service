@@ -6,9 +6,14 @@
     "start": "prisma generate --schema=./src/prisma/schema.prisma && ts-node dist/server.ts",
     "build": "prisma generate --schema=./src/prisma/schema.prisma && tsc",
     "dev": "nodemon src/server.ts",
-    "migration": "prisma migrate dev --create-only --schema=./src/prisma/schema.prisma",
-    "migrate": "prisma migrate deploy --schema=./src/prisma/schema.prisma",
-    "generate": "prisma generate --schema=./src/prisma/schema.prisma"
+    "create-migration": "prisma migrate dev --create-only --schema=./src/prisma/schema.prisma",
+    "prisma-migrate": "prisma migrate deploy --schema=./src/prisma/schema.prisma",
+    "prisma-generate": "prisma generate --schema=./src/prisma/schema.prisma",
+    "prisma-studio": "prisma studio --schema=./src/prisma/schema.prisma",
+    "prisma-seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node ./src/prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
