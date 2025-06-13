@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { createUserService, getAllUsersService, signInService } from "../services/user.service";
-import { ConflictError, InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
 import { logger } from "../config/logger.config";
+import { createUserService, getAllUsersService, signInService, userHasRole } from "../services/user.service";
+import { BadRequestError, ConflictError, InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
 
 export const signUpHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -53,6 +53,30 @@ export const signInHandler = async (req: Request, res: Response, next: NextFunct
     } catch (error) {
         if (error instanceof UnauthorizedError || error instanceof NotFoundError || error instanceof InternalServerError) {
             logger.error(`Error in signInHanlder: ${error.message}`);
+            res.status(error.statusCode).json({
+                success: false,
+                message: error.message,
+                data: {},
+            });
+        }
+    }
+}
+
+export const hasRoleHandler = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            throw new NotFoundError("Token not found");
+        }
+        const role = req.body.role;
+        const result = await userHasRole({ token, role });
+        res.status(StatusCodes.OK).json({
+            success: true,
+            message: `User ${!result ? "doesnt't have" : "has"} ${req.body.role} role`,
+            data: result
+        });
+    } catch (error) {
+        if (error instanceof BadRequestError || error instanceof UnauthorizedError || error instanceof NotFoundError) {
             res.status(error.statusCode).json({
                 success: false,
                 message: error.message,

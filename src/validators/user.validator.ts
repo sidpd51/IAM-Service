@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { RoleType } from "../dto/user.dto";
 const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-;
+
 
 
 export const signUpSchema = z.object({
@@ -24,3 +25,7 @@ export const signInSchema = z.object({
         required_error: "Password is required",
     }).regex(strongPasswordRegex, "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
 });
+
+export const hasRoleSchema = z.object({
+    role: z.nativeEnum(RoleType)
+}).strict();
