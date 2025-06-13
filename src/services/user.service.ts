@@ -2,9 +2,10 @@ import { Prisma } from "@prisma/client";
 import { createUser, getAllUsers, getUserByEmail } from "../repositories/user.repository";
 import { signInDto } from "../dto/user.dto";
 import bcrypt from 'bcrypt';
-import { InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
-import jwt from 'jsonwebtoken';
+import { BadRequestError, InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
+import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { serverConfig } from "../config";
+import { UUIDTypes } from "uuid";
 
 export const createUserService = async (user: Prisma.UserCreateInput) => {
     try {
@@ -36,7 +37,7 @@ export const signInService = async (credentials: signInDto) => {
             throw new UnauthorizedError("Invalid password!");
         }
 
-        return createToken(credentials);
+        return createToken(user.id);
 
     } catch (error) {
         throw error;
@@ -51,11 +52,26 @@ const comparePwd = async (plainPwd: string, hashPwd: string) => {
     }
 }
 
-const createToken = (credentials: signInDto) => {
+const createToken = (id: UUIDTypes) => {
     try {
-        const token = jwt.sign(credentials, serverConfig.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id }, serverConfig.JWT_SECRET, { expiresIn: "20s" });
         return token;
     } catch (error) {
         throw new InternalServerError("Error in createToken Service");
+    }
+}
+
+
+const verifyToken = async (token: string) => {
+    try {
+        const decoded = jwt.verify(token, serverConfig.JWT_SECRET);
+        console.log("Decoded token payload: ", decoded);
+    } catch (error) {
+        if (error instanceof TokenExpiredError) {
+            throw new UnauthorizedError("Authentication token has expired");
+        }
+        if (error instanceof JsonWebTokenError) {
+            throw new BadRequestError("Malformed authentication token");
+        }
     }
 }
