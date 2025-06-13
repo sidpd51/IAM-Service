@@ -19,3 +19,8 @@ export type UserHasRoleDto = {
 export interface DecodedToken extends JwtPayload {
     id: string;
 }
+
+export type AddRoleToUserDto = {
+    userId: string,
+    roleType: string
+}

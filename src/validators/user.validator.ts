@@ -29,3 +29,8 @@ export const signInSchema = z.object({
 export const hasRoleSchema = z.object({
     role: z.nativeEnum(RoleType)
 }).strict();
+
+export const AddRoleSchema = z.object({
+    userId: z.string({ required_error: "userId is required" }).uuid("Invalid UUID format"),
+    roleType: z.nativeEnum(RoleType)
+});
