@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { createUserService, getAllUsersService, signInService } from "../services/user.service";
 import { ConflictError, InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
+import { logger } from "../config/logger.config";
 
 export const signUpHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -13,6 +14,7 @@ export const signUpHandler = async (req: Request, res: Response, next: NextFunct
         });
     } catch (error) {
         if (error instanceof ConflictError) {
+            logger.error(`Error in signUpHandler: ${error.message}`);
             res.status(error.statusCode).json({
                 success: false,
                 message: error.message,
@@ -32,6 +34,7 @@ export const getAllUsersHandler = async (req: Request, res: Response, next: Next
         });
     } catch (error) {
         if (error instanceof InternalServerError) {
+            logger.error(`Error in getAllUsersHandler: ${error.message}`);
             res.status(error.statusCode).json({
                 success: false,
                 message: error.message,
@@ -49,12 +52,12 @@ export const signInHandler = async (req: Request, res: Response, next: NextFunct
         res.status(StatusCodes.OK).json({ token });
     } catch (error) {
         if (error instanceof UnauthorizedError || error instanceof NotFoundError || error instanceof InternalServerError) {
+            logger.error(`Error in signInHanlder: ${error.message}`);
             res.status(error.statusCode).json({
                 success: false,
                 message: error.message,
                 data: {},
             });
         }
-        console.log(error);
     }
 }
