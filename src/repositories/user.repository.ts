@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library";
-import { prisma } from "../prisma/client";
-import { ConflictError, InternalServerError } from "../utils/errors/app.error";
 import bcrypt from 'bcrypt';
 import { serverConfig } from "../config";
+import { prisma } from "../prisma/client";
+import { ConflictError, InternalServerError } from "../utils/errors/app.error";
 
 const userPublicFields = {
     id: true,
@@ -13,14 +13,32 @@ const userPublicFields = {
     updatedAt: true,
 };
 
+
 export const createUser = async (userData: Prisma.UserUncheckedCreateInput) => {
     try {
         userData.password = await bcrypt.hash(userData.password, serverConfig.SALT_ROUNDS);
-
         const { password, ...restAttributes } = await prisma.user.create({
-            data: userData
+            data: {
+                ...userData,
+                roles: {
+                    create: [
+                        {
+                            isAdmin: false,
+                            assignedAt: new Date(),
+                            role: {
+                                connectOrCreate: {
+                                    where: { name: "user" },
+                                    create: {
+                                        name: "user",
+                                        description: "Regular app user with access to browse, book, and attend fitness sessions, track progress, and manage their profile and subscriptions.",
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+            }
         });
-
         return restAttributes;
     } catch (error) {
         if (error instanceof PrismaClientKnownRequestError) {
