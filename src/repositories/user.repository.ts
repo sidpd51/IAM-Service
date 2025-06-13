@@ -3,7 +3,7 @@ import { PrismaClientKnownRequestError, PrismaClientValidationError } from "@pri
 import bcrypt from 'bcrypt';
 import { serverConfig } from "../config";
 import { prisma } from "../prisma/client";
-import { ConflictError, InternalServerError } from "../utils/errors/app.error";
+import { ConflictError, InternalServerError, NotFoundError } from "../utils/errors/app.error";
 
 const userPublicFields = {
     id: true,
@@ -64,7 +64,8 @@ export const getUserByEmail = async (email: string) => {
                 email
             },
             select: {
-                password: true
+                password: true,
+                id: true
             }
         });
         return user;
@@ -81,5 +82,36 @@ export const getAllUsers = async () => {
         return users;
     } catch (error) {
         throw new InternalServerError("Something went wrong in getAllUsers");
+    }
+}
+
+export const getUserRolesById = async (id: string) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id,
+            },
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                roles: {
+                    select: {
+                        role: {
+                            select: {
+                                name: true
+                            }
+                        },
+                        isAdmin: true
+                    }
+                },
+            },
+        });
+        if (!user) {
+            throw new NotFoundError(`User doesn't exist with id: ${id}`);
+        }
+        return user.roles;
+    } catch (error) {
+        throw error;
     }
 }
