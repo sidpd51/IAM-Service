@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { logger } from "../config/logger.config";
-import { createUserService, getAllUsersService, signInService, userHasRole } from "../services/user.service";
+import { addRoleToUserService, createUserService, getAllUsersService, signInService, userHasRole } from "../services/user.service";
 import { BadRequestError, ConflictError, InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
 
 export const signUpHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -77,6 +77,27 @@ export const hasRoleHandler = async (req: Request, res: Response, next: NextFunc
         });
     } catch (error) {
         if (error instanceof BadRequestError || error instanceof UnauthorizedError || error instanceof NotFoundError) {
+            logger.error(`Error in hasRoleHandler: ${error.message}`);
+            res.status(error.statusCode).json({
+                success: false,
+                message: error.message,
+                data: {},
+            });
+        }
+    }
+}
+
+export const AddRoleHandler = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await addRoleToUserService(req.body);
+        res.status(StatusCodes.OK).json({
+            success: true,
+            message: `${req.body.role} role has been assigned to user with id: ${req.body.userId}`,
+            data: {}
+        });
+    } catch (error) {
+        if (error instanceof BadRequestError || error instanceof UnauthorizedError || error instanceof NotFoundError || error instanceof ConflictError) {
+            logger.error(`Error in AddRoleHandler: ${error.message}`);
             res.status(error.statusCode).json({
                 success: false,
                 message: error.message,

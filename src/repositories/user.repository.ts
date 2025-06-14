@@ -13,7 +13,6 @@ const userPublicFields = {
     updatedAt: true,
 };
 
-
 export const createUser = async (userData: Prisma.UserUncheckedCreateInput) => {
     try {
         userData.password = await bcrypt.hash(userData.password, serverConfig.SALT_ROUNDS);
@@ -115,3 +114,24 @@ export const getUserRolesById = async (id: string) => {
         throw error;
     }
 }
+
+export const findUserById = async (userId: string) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: {
+                id: true
+            }
+        });
+
+        if (!user) {
+            throw new NotFoundError(`User doesn't exist with id: ${userId}`);
+        }
+        return user;
+    } catch (error) {
+        throw error;
+    }
+}
+

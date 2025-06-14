@@ -3,8 +3,10 @@ import bcrypt from 'bcrypt';
 import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { UUIDTypes } from "uuid";
 import { serverConfig } from "../config";
-import { DecodedToken, signInDto, UserHasRoleDto } from "../dto/user.dto";
-import { createUser, getAllUsers, getUserByEmail, getUserRolesById } from "../repositories/user.repository";
+import { AddRoleToUserDto, DecodedToken, signInDto, UserHasRoleDto } from "../dto/user.dto";
+import { findRoleByName } from "../repositories/role.repository";
+import { createUser, findUserById, getAllUsers, getUserByEmail, getUserRolesById } from "../repositories/user.repository";
+import { AddRoleToUser } from "../repositories/userRole.repository";
 import { BadRequestError, InternalServerError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error";
 
 export const createUserService = async (user: Prisma.UserCreateInput) => {
@@ -84,6 +86,17 @@ export const userHasRole = async (payload: UserHasRoleDto) => {
         const roles = await getUserRolesById(user.id);
         const hasRole = roles.some((role) => role.role.name === payload.role);
         return hasRole;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const addRoleToUserService = async (payload: AddRoleToUserDto) => {
+    try {
+        const { userId, roleType } = payload;
+        const user = await findUserById(userId);
+        const role = await findRoleByName(roleType);
+        await AddRoleToUser(role.id, user.id, roleType);
     } catch (error) {
         throw error;
     }
