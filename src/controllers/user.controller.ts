@@ -92,7 +92,7 @@ export const AddRoleHandler = async (req: Request, res: Response, next: NextFunc
         await addRoleToUserService(req.body);
         res.status(StatusCodes.OK).json({
             success: true,
-            message: `${req.body.role} role has been assigned to user with id: ${req.body.userId}`,
+            message: `${req.body.roleType} role has been assigned to user with id: ${req.body.userId}`,
             data: {}
         });
     } catch (error) {
