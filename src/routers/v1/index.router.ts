@@ -6,8 +6,8 @@ import { signInHandler, signUpHandler } from '../../controllers/user.controller'
 
 const v1Router = express.Router();
 
-userRouter.post('/signup', validateRequetBody(signUpSchema), signUpHandler);
-userRouter.post('/signin', validateRequetBody(signInSchema), signInHandler);
+v1Router.post('/signup', validateRequetBody(signUpSchema), signUpHandler);
+v1Router.post('/signin', validateRequetBody(signInSchema), signInHandler);
 v1Router.use('/users', userRouter);
 
 export default v1Router;

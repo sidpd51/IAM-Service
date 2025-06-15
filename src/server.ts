@@ -13,7 +13,7 @@ app.use(express.json());
 const PORT: number = serverConfig.PORT;
 
 app.use(attachCorrelationIdMiddleware);
-app.use('/api/v1', v1Router);
+app.use('/api/v1/iam', v1Router);
 app.use(appErrorHandler);
 
 
