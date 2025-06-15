@@ -1,112 +1,154 @@
-# IAMService 🏨
+# IAM-Service
+
+A robust Identity and Access Management (IAM) REST API built with **Express**, **TypeScript**, **Prisma ORM**, and **MySQL**. This service provides secure user authentication, role-based access control (RBAC), centralized error handling, request tracing, and structured logging.
 
 ---
 
 ## 🚀 Features
 
--   Express REST API
--   Prisma ORM with MySQL
--   TypeScript support
--   Centralized error handling
--   Request tracing via Correlation IDs
--   Winston-based logging
--   User authentication and authorization
--   Role-based access control (RBAC)
--   Environment-based configuration
+-   **Express REST API** for user and role management
+-   **Prisma ORM** with MySQL for database access
+-   **TypeScript** for type safety and maintainability
+-   **Centralized error handling** with custom error classes
+-   **Request tracing** using Correlation IDs (AsyncLocalStorage)
+-   **Winston-based logging** with correlation context
+-   **User authentication** (JWT-based)
+-   **Role-based access control (RBAC)**
+-   **Environment-based configuration** via `.env`
+-   **Input validation** using Zod schemas
 
 ---
 
 ## 🛠️ Prerequisites
 
-Make sure you have the following installed:
-
 -   [Node.js](https://nodejs.org/)
+-   [MySQL](https://www.mysql.com/)
 -   [Git](https://git-scm.com/)
--   [MySQL](https://www.mysql.com/) (for local development)
 
 ---
 
 ## 📦 Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/sidpd51/IAMService.git
-cd IAMService
+```sh
+git clone https://github.com/your-org/IAM-Service.git
+cd IAM-Service
 
-# Install dependencies
 npm install
 
-# Create .env file from example
 cp .env.example .env
-
-# Update .env with your database and app configuration
-
-# Generate prisma client
-npm run generate
+# Edit .env with your database credentials and secrets
 ```
 
 ---
 
 ## 🗄️ Database Setup
 
-1. Create a MySQL database for the project.
-2. Update your `.env` file with the correct database credentials.
-3. Deploy migrations to your database:
+1. Create a MySQL database (e.g., `iam_service`).
+2. Update your `.env` with the correct `DATABASE_URL`.
+3. Run migrations and generate the Prisma client:
 
-```bash
-npm run migrate
+```sh
+npm run build
+npm run prisma-migrate
+npm run prisma-generate
 ```
+
+4. (Optional) Seed the database:
+
+```sh
+npm run prisma-seed
+```
+
 ---
 
 ## 🚦 Running the Application
 
-```bash
+**Development:**
+
+```sh
 npm run dev
 ```
 
-The server will start on the port specified in your `.env` file.
+**Production:**
 
-For production, use:
-
-```bash
+```sh
 npm run build
 npm start
 ```
 
 ---
 
-## 🧪 Running Tests
+## 🧪 Testing
 
-```bash
-npm test
-```
+> _No test scripts are defined yet. Add your tests in the `tests/` directory and configure npm scripts as needed._
 
 ---
 
 ## 📁 Project Structure
 
 ```
-IAMService/
+IAM-Service/
 ├── src/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   └── utils/
-├── src/prisma/
-│   ├── schema.prisma
-│   └── migrations/
+│   ├── config/           # App and logger configuration
+│   ├── controllers/      # Express route handlers
+│   ├── dto/              # Data transfer objects and enums
+│   ├── middlewares/      # Express middlewares (error, correlation)
+│   ├── prisma/           # Prisma schema, migrations, seed, and samples
+│   ├── repositories/     # Data access logic
+│   ├── routers/          # Express routers (v1)
+│   ├── services/         # Business logic
+│   ├── utils/            # Helpers and error classes
+│   └── validators/       # Zod schemas and validation middleware
 ├── .env.example
-├── README.md
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── README.md
 ```
 
 ---
 
 ## 📝 Notes
 
-- For production, ensure you set secure environment variables and use a robust database.
-- Logging and error handling are centralized for easier debugging and monitoring.
-- For more details, see inline comments in the codebase.
+-   **Environment variables**: All sensitive config is managed via `.env`.
+-   **Logging**: All logs include a correlation ID for traceability.
+-   **Error handling**: Centralized and consistent error responses.
+-   **RBAC**: Easily extendable for more roles and permissions.
+-   **Prisma**: All database models and migrations are managed in `src/prisma/`.
+
+---
+
+## 📚 API Endpoints
+
+> See `src/routers/v1/user.router.ts` for details.
+
+-   `GET /api/v1/users/` — List all users
+-   `POST /api/v1/users/signup` — Register a new user
+-   `POST /api/v1/users/signin` — Authenticate and receive JWT
+-   `POST /api/v1/users/hasrole` — Check if user has a specific role
+-   `POST /api/v1/users/addrole` — Assign a role to a user
+
+---
+
+## 🛡️ Security
+
+-   Passwords are hashed with bcrypt.
+-   JWT is used for authentication.
+-   Input validation is enforced with Zod.
+
+---
+
+## 👥 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+---
+
+## 📄 License
+
+MIT
+
+---
+
+## 📞 Contact
+
+For questions, open an issue or contact the maintainer.
